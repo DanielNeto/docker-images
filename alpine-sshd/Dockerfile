@@ -3,7 +3,7 @@ FROM        alpine:${ALPINE_VERSION}
 
 LABEL       maintainer="https://github.com/DanielNeto"
 
-ARG         OPENSSH_VERSION=${OPENSSH_VERSION:-7.9}
+ARG         OPENSSH_VERSION=${OPENSSH_VERSION:-7.7_p1-r4}
 ENV         OPENSSH_VERSION=${OPENSSH_VERSION}
 
 RUN         apk update && \
@@ -12,6 +12,12 @@ RUN         apk update && \
             apk add iperf && \
             mkdir -p /root/.ssh && \
             rm -rf /var/cache/apk/* /tmp/*
+
+##Generate host keys if not presente
+RUN         ssh-keygen -A
+
+##Enable root login
+RUN         sed -i s/#PermitRootLogin.*/PermitRootLogin\ yes/ /etc/ssh/sshd_config
 
 ##Setting root password as root
 RUN         echo "root:root" | chpasswd
